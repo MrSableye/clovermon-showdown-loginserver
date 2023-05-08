@@ -29,8 +29,15 @@ exports.routes = {
 
 /** @type {string} */
 exports.mainserver = 'showdown';
-/** @type {string} */
-exports.serverlist = '/var/www/html/play.pokemonshowdown.com/config/servers.inc.php';
+/** @type {Record<string, { name: string, id: string, server: string, port: number, token?: string; skipipcheck?: boolean; ipcache?: string; }>} */
+exports.servers = {
+	showdown: {
+		name: 'Smogon University',
+		id: 'showdown',
+		server: 'sim.psim.us',
+		port: 8000,
+	},
+};
 /** @type {string | null} */
 exports.colorpath = null;
 

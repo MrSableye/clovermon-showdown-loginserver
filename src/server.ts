@@ -246,13 +246,7 @@ export class ActionContext {
 export const SimServers = new class SimServersT {
 	servers: {[k: string]: RegisteredServer} = this.loadServers();
 	hostCache = new Map<string, string>();
-	constructor() {
-		fs.watchFile(Config.serverlist, (curr, prev) => {
-			if (curr.mtime > prev.mtime) {
-				this.loadServers();
-			}
-		});
-	}
+	constructor() {}
 
 	async getHost(server: string) {
 		let result = this.hostCache.get(server);
@@ -291,16 +285,8 @@ export const SimServers = new class SimServersT {
 		}
 		return server;
 	}
-	loadServers(path = Config.serverlist): {[k: string]: RegisteredServer} {
-		if (!path) return {};
-		try {
-			const stdout = child.execFileSync(
-				`php`, ['-f', __dirname + '/../../src/lib/load-servers.php', path]
-			).toString();
-			return JSON.parse(stdout);
-		} catch (e: any) {
-			if (!['ENOENT', 'ENOTDIR', 'ENAMETOOLONG'].includes(e.code)) throw e;
-		}
+	loadServers(): {[k: string]: RegisteredServer} {
+		if (Config.servers) return Config.servers;
 		return {};
 	}
 };
@@ -316,7 +302,7 @@ export class Server {
 		this.port = port;
 
 		this.server = http.createServer((req, res) => void this.handle(req, res));
-		this.server.listen(port);
+		this.server.listen(port, () => console.log('listening to ' + port));
 		this.httpsServer = null;
 		if (Config.ssl) {
 			this.httpsServer = https.createServer(Config.ssl, (req, res) => void this.handle(req, res));
