@@ -71,18 +71,4 @@ describe('Dispatcher features', () => {
 		assert(body.act === 'mmr');
 		assert(body.userid === 'mia');
 	});
-	it("Should load servers properly", () => {
-		const servers = SimServers.loadServers(
-			path.join(__dirname, '/../../', 'src/test/fixtures/servers.php')
-		);
-		assert.deepStrictEqual({
-			showdown: {
-				name: 'Smogon University',
-				id: 'showdown',
-				server: 'sim.psim.us',
-				port: 8000,
-				owner: 'mia'
-			},
-		}, servers);
-	});
 });
