@@ -13,6 +13,7 @@ import {toID, updateserver, bash, time} from './utils';
 import * as tables from './tables';
 import * as pathModule from 'path';
 import IPTools from './ip-tools';
+import Axios from 'axios';
 
 export const actions: {[k: string]: QueryHandler} = {
 	async register(params) {
@@ -27,6 +28,9 @@ export const actions: {[k: string]: QueryHandler} = {
 		}
 		if (await tables.users.get(userid)) {
 			throw new ActionError("Your username is already taken.");
+		}
+		if (Config.migrationEnabled && Config.migrationWhitelistedUsers[userid]) {
+			throw new ActionError("Your username is whitelisted for migration. Please login instead of registering.");
 		}
 
 		if (!password) {
@@ -73,7 +77,6 @@ export const actions: {[k: string]: QueryHandler} = {
 		await this.session.logout(true);
 		return {actionsuccess: true};
 	},
-
 	async login(params) {
 		this.setPrefix('');
 		const challengeprefix = this.verifyCrossDomainRequest();
@@ -87,6 +90,30 @@ export const actions: {[k: string]: QueryHandler} = {
 		if (!userid) {
 			throw new ActionError(`incorrect login data, userid must contain at least one letter or number`);
 		}
+		if (Config.migrationEnabled && Config.migrationWhitelistedUsers[userid] && !(await tables.users.get(userid))) {
+			const {data} = await Axios.post(Config.migrationOldLoginUrl, {
+				act: 'login',
+				name: params.name,
+				pass: params.pass,
+			});
+
+			if (data.startsWith(']')) {
+				const loginData = JSON.parse(data.substring(1));
+				const successfulAction = loginData.actionsuccess === true;
+				if (successfulAction) {
+					const user = await this.session.addUser(params.name, params.pass);
+					if (user === null) {
+						throw new ActionError(`Your username is already taken. [Whitelist flow]`);
+					}
+					return this.executeActions(); // Begin the cycle anew... login again but for real!
+				} else {
+					throw new ActionError("Wrong password. [Whitelist flow]");
+				}
+			} else {
+				throw new ActionError("This username is whitelisted for migration, but an error has occured.");
+			}
+		}
+
 		const challengekeyid = parseInt(params.challengekeyid!) || -1;
 		const actionsuccess = await this.session.login(params.name, params.pass);
 		if (!actionsuccess) return {actionsuccess, assertion: false};
@@ -250,12 +277,15 @@ export const actions: {[k: string]: QueryHandler} = {
 
 	async getassertion(params) {
 		this.setPrefix('');
-		params.userid = toID(params.userid) || this.user.id;
+		const userid = toID(params.userid) || this.user.id;
+		if (Config.migrationEnabled && Config.migrationWhitelistedUsers[userid] && !(await tables.users.get(userid))) {
+			return ';'; // Consider these users as "registered" to force login
+		}
 		// NaN is falsy so this validates
 		const challengekeyid = Number(params.challengekeyid) || -1;
 		const challenge = params.challenge || params.challstr || "";
 		return this.session.getAssertion(
-			params.userid,
+			userid,
 			challengekeyid,
 			this.user,
 			challenge,

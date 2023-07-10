@@ -162,3 +162,18 @@ exports.standings = {
 	"30": "Permaban",
 	"100": "Disabled",
 };
+
+/**
+ * @type {boolean}
+ */
+exports.migrationEnabled = false;
+
+/**
+ * @type {string}
+ */
+exports.migrationOldLoginUrl = 'https://play.pokemonshowdown.com/~~showdown/action.php';
+
+/**
+ * @type {Record<string, boolean>}
+ */
+exports.migrationWhitelistedUsers = {};
