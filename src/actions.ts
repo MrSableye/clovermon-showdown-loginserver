@@ -105,6 +105,7 @@ export const actions: {[k: string]: QueryHandler} = {
 					if (user === null) {
 						throw new ActionError(`Your username is already taken. [Whitelist flow]`);
 					}
+					console.log(`Successfully migrated and registered user ${userid}`);
 					return this.executeActions(); // Begin the cycle anew... login again but for real!
 				} else {
 					throw new ActionError("Wrong password. [Whitelist flow]");
