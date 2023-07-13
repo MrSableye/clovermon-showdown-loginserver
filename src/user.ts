@@ -299,7 +299,7 @@ export class Session {
 			);
 		}
 
-		return data + ';' + await signAsync('RSA-SHA1', data, Config.privatekey);
+		return data + ';' + await signAsync(Config.privatekeyalgo, data, Config.privatekey);
 	}
 	static getBannedNameTerms() {
 		return [

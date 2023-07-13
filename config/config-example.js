@@ -86,6 +86,8 @@ exports.sysops = [];
 // Private key to use for validating assertions.
 /** @type {string} */
 exports.privatekey = '';
+/** @type {string} */
+exports.privatekeyalgo = 'RSA-SHA1';
 // current active challengekeyid (backwards compatibility)
 /** @type {number} */
 exports.challengekeyid = 4;
