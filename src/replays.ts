@@ -192,7 +192,7 @@ export const Replays = new class {
 			if (args.username2) {
 				const userid2 = toID(args.username2);
 				if (format) {
-					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ps_replays 
+					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays 
 						FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid} 
 						AND p2id = ${userid2} AND format = ${format} 
@@ -200,39 +200,39 @@ export const Replays = new class {
 						${order} DESC)
 						 UNION 
 						(SELECT uploadtime, id, format, p1, p2, password 
-						FROM ps_replays FORCE INDEX (p1) 
+						FROM ntbb_replays FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid2} AND p2id = ${userid} 
 						AND format = ${format}
 						 ORDER BY ${order} DESC)
 						 ORDER BY ${order} DESC LIMIT ${limit1}, 51;`;
 				} else {
-					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ps_replays 
+					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays 
 						FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid} AND p2id = ${userid2}
 						 ORDER BY ${order} DESC)
 						 UNION 
-						(SELECT uploadtime, id, format, p1, p2, password FROM ps_replays FORCE INDEX (p1) 
+						(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid2} AND p2id = ${userid} 
 						ORDER BY ${order} DESC)
 						 ORDER BY ${order} DESC LIMIT ${limit1}, 51;`;
 				}
 			} else {
 				if (format) {
-					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ps_replays 
+					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays 
 						FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid} AND format = ${format} 
 						ORDER BY ${order} DESC) 
 						 UNION 
-						(SELECT uploadtime, id, format, p1, p2, password FROM ps_replays FORCE INDEX (p2)
+						(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays FORCE INDEX (p2)
 						 WHERE private = ${isPrivate} AND p2id = ${userid} AND format = ${format} 
 						ORDER BY ${order} DESC)
 						 ORDER BY ${order} DESC LIMIT ${limit1}, 51;`;
 				} else {
-					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ps_replays 
+					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays 
 						FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid} ORDER BY ${order} DESC)
 						 UNION 
-						(SELECT uploadtime, id, format, p1, p2, password FROM ps_replays FORCE INDEX (p2) 
+						(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays FORCE INDEX (p2) 
 						WHERE private = ${isPrivate} AND p2id = ${userid} ORDER BY ${order} DESC)
 						 ORDER BY ${order} DESC LIMIT ${limit1}, 51;`;
 				}
@@ -241,11 +241,11 @@ export const Replays = new class {
 
 		if (args.byRating) {
 			return replays.query()`SELECT uploadtime, id, format, p1, p2, rating, password 
-				FROM ps_replays FORCE INDEX (top) 
+				FROM ntbb_replays FORCE INDEX (top) 
 				WHERE private = ${isPrivate} AND formatid = ${format} ORDER BY rating DESC LIMIT ${limit1}, 51`;
 		} else {
 			return replays.query()`SELECT uploadtime, id, format, p1, p2, rating, password 
-				FROM ps_replays FORCE INDEX (format) 
+				FROM ntbb_replays FORCE INDEX (format) 
 				WHERE private = ${isPrivate} AND formatid = ${format} ORDER BY uploadtime DESC LIMIT ${limit1}, 51`;
 		}
 	}
@@ -262,7 +262,7 @@ export const Replays = new class {
 		const secondPattern = patterns.length >= 2 ? SQL`AND log LIKE ${patterns[1]} ` : undefined;
 
 		return replays.query()`SELECT /*+ MAX_EXECUTION_TIME(10000) */ 
-			uploadtime, id, format, p1, p2, password FROM ps_replays 
+			uploadtime, id, format, p1, p2, password FROM ntbb_replays 
 			FORCE INDEX (recent) WHERE private = 0 AND log LIKE ${patterns[0]} ${secondPattern}
 			ORDER BY uploadtime DESC LIMIT 10;`;
 	}
