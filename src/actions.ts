@@ -282,6 +282,10 @@ export const actions: {[k: string]: QueryHandler} = {
 	async getassertion(params) {
 		this.setPrefix('');
 		const userid = toID(params.userid) || this.user.id;
+		if (Config.migrationEnabled && Config.migrationReservedNames[userid] && !(await tables.users.get(userid))) {
+			this.verifyCrossDomainRequest();
+			return ';;Your username is reserved.';
+		}
 		if (Config.migrationEnabled && Config.migrationWhitelistedUsers[userid] && !(await tables.users.get(userid))) {
 			this.verifyCrossDomainRequest();
 			return ';'; // Consider these users as "registered" to force login
