@@ -210,7 +210,9 @@ export class ActionContext {
 		return Config.trustedproxies.some(f => IPTools.checkPattern(f, ip));
 	}
 	getIp() {
-		const ip = this.request.socket.remoteAddress || "";
+		const realIpHeader = this.request.headers['x-real-ip'];
+		const realIp = Array.isArray(realIpHeader) ? realIpHeader[0] : realIpHeader;
+		const ip = realIp || this.request.socket.remoteAddress || "";
 		let forwarded = this.request.headers['x-forwarded-for'] || '';
 		if (!Array.isArray(forwarded)) forwarded = forwarded.split(',');
 		const notProxy = forwarded.filter(f => !this.isTrustedProxy(f));
