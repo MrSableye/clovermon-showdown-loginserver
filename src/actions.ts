@@ -32,6 +32,9 @@ export const actions: {[k: string]: QueryHandler} = {
 		if (Config.migrationEnabled && Config.migrationWhitelistedUsers[userid]) {
 			throw new ActionError("Your username is whitelisted for migration. Please login instead of registering.");
 		}
+		if (Config.migrationEnabled && Config.migrationReservedNames[userid]) {
+			throw new ActionError("Your username is reserved by another user. Please use another name.");
+		}
 
 		if (!password) {
 			throw new ActionError('You must specify a password.');

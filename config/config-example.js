@@ -179,3 +179,8 @@ exports.migrationOldLoginUrl = 'https://play.pokemonshowdown.com/~~showdown/acti
  * @type {Record<string, boolean>}
  */
 exports.migrationWhitelistedUsers = {};
+
+/**
+ * @type {Record<string, boolean>}
+ */
+exports.migrationReservedNames = {};
