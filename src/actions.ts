@@ -280,6 +280,7 @@ export const actions: {[k: string]: QueryHandler} = {
 		this.setPrefix('');
 		const userid = toID(params.userid) || this.user.id;
 		if (Config.migrationEnabled && Config.migrationWhitelistedUsers[userid] && !(await tables.users.get(userid))) {
+			this.verifyCrossDomainRequest();
 			return ';'; // Consider these users as "registered" to force login
 		}
 		// NaN is falsy so this validates
