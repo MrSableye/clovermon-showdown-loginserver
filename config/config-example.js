@@ -184,3 +184,8 @@ exports.migrationWhitelistedUsers = {};
  * @type {Record<string, boolean>}
  */
 exports.migrationReservedNames = {};
+
+/**
+ * @type {string | null}
+ */
+exports.registrationBypassPassword = null;

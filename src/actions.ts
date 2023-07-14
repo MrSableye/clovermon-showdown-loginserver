@@ -18,7 +18,7 @@ import Axios from 'axios';
 export const actions: {[k: string]: QueryHandler} = {
 	async register(params) {
 		this.verifyCrossDomainRequest();
-		const {username, password, cpassword, captcha} = params;
+		const {username, password, cpassword, captcha, bypass} = params;
 		if (!username) {
 			throw new ActionError(`You must specify a username.`);
 		}
@@ -51,9 +51,12 @@ export const actions: {[k: string]: QueryHandler} = {
 		if (toID(captcha) !== 'pikachu') {
 			throw new ActionError(`Answer the anti-spam question.`);
 		}
-		const regcount = await this.session.getRecentRegistrationCount(2 * 60 * 60);
-		if (regcount && regcount > 2) {
-			throw new ActionError(`You cannot register more than 2 names every 2 hours.`);
+		const canBypass = Config.registrationBypassPassword && (Config.registrationBypassPassword === bypass);
+		if (!canBypass) {
+			const regcount = await this.session.getRecentRegistrationCount(2 * 60 * 60);
+			if (regcount && regcount > 2) {
+				throw new ActionError(`You cannot register more than 2 names every 2 hours.`);
+			}
 		}
 		const user = await this.session.addUser(username, password);
 		if (user === null) {
