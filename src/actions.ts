@@ -533,6 +533,66 @@ export const actions: {[k: string]: QueryHandler} = {
 			matches: await tables.users.selectAll(['userid', 'banstate'])`WHERE ip = ${res.ip}`,
 		};
 	},
+
+	async getreplay(params) {
+		const {id, password} = params;
+
+		if (!id) {
+			throw new ActionError("Replay id not specified.");
+		}
+
+		const replay = await Replays.get(id);
+
+		if (!replay) {
+			throw new ActionError(`Replay ${id} not found.`);
+		}
+
+		if (replay.password && replay.password !== password) {
+			throw new ActionError(`Replay ${id} not found.`);
+		}
+
+		return {replay};
+	},
+
+	async searchreplays(params) {
+		const {page, rating, format, username, username2} = params;
+
+		const replays = await Replays.search({
+			page: parseInt(page || '0') || 0,
+			byRating: rating !== undefined,
+			format,
+			username,
+			username2,
+			isPrivate: false,
+		});
+
+		return {replays};
+	},
+
+	async getuser(params) {
+		const {username} = params;
+		const userid = toID(username);
+
+		if (!userid) {
+			throw new ActionError("User id not specified.");
+		}
+
+		const user = await tables.users.get(userid);
+
+		if (!user) {
+			throw new ActionError(`User ${userid} not found.`);
+		}
+
+		return {
+			user: {
+				userid: user.userid,
+				username: user.username,
+				registertime: user.registertime,
+				group: user.group,
+				// TODO: Ratings
+			},
+		};
+	},
 };
 
 if (Config.actions) {
