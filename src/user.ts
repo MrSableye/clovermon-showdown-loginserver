@@ -304,14 +304,11 @@ export class Session {
 	static getBannedNameTerms() {
 		return [
 			...(Config.bannedTerms || []),
-			'nigger', 'nigga', 'faggot',
-			/(lol|ror)icon/, 'lazyafrican',
-			'tranny',
 		];
 	}
 	static isUseridAllowed(userid: string) {
 		for (const term of Session.getBannedNameTerms()) {
-			if (typeof term === 'object' ? term.test(userid) : userid.includes(term)) {
+			if (userid.includes(term)) {
 				return false;
 			}
 		}
