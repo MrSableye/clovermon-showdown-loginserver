@@ -223,7 +223,7 @@ export class Session {
 					userType = '5';
 				} else if (banstate === 0) {
 					// should we update autoconfirmed status? check to see if it's been long enough
-					if (registertime && time() - registertime > (7 * 24 * 60 * 60)) {
+					if (registertime && time() - registertime > (3 * 24 * 60 * 60)) {
 						userType = '4';
 						void users.update(userid, {banstate: -10});
 					}
