@@ -224,11 +224,8 @@ export class Session {
 				} else if (banstate === 0) {
 					// should we update autoconfirmed status? check to see if it's been long enough
 					if (registertime && time() - registertime > (7 * 24 * 60 * 60)) {
-						const ladders = await ladder.selectOne(['formatid'])`WHERE userid = ${userid} AND w != 0`;
-						if (ladders) {
-							userType = '4';
-							void users.update(userid, {banstate: -10});
-						}
+						userType = '4';
+						void users.update(userid, {banstate: -10});
 					}
 				}
 			}
