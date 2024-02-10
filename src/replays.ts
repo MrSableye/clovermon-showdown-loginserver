@@ -240,7 +240,7 @@ export const Replays = new class {
 		}
 
 		if (!format) {
-			return this.recent();
+			return this.recent(page);
 		}
 
 		if (args.byRating) {
@@ -271,10 +271,13 @@ export const Replays = new class {
 			ORDER BY uploadtime DESC LIMIT 10;`;
 	}
 
-	async recent() {
+	async recent(page = 1) {
+		let limit1 = 50 * (page - 1);
+		if (limit1 < 0) limit1 = 0;
+
 		return replays.selectAll(
 			SQL`uploadtime, id, format, p1, p2`
-		)`FORCE INDEX (recent) WHERE private = 0 ORDER BY uploadtime DESC LIMIT 50`;
+		)`FORCE INDEX (recent) WHERE private = 0 ORDER BY uploadtime LIMIT ${limit1}, 51`;
 	}
 };
 
