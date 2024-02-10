@@ -239,6 +239,10 @@ export const Replays = new class {
 			}
 		}
 
+		if (!format) {
+			return this.recent();
+		}
+
 		if (args.byRating) {
 			return replays.query()`SELECT uploadtime, id, format, p1, p2, rating, password 
 				FROM ntbb_replays FORCE INDEX (top) 
