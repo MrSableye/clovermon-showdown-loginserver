@@ -132,7 +132,7 @@ export class Database {
 			if (query.sql[i + 1].startsWith('`')) {
 				sql = sql.slice(0, -1) + this.connection.escapeId('' + value) + query.sql[i + 1].slice(1);
 			} else if (value === 'ASC' || value === 'DESC') {
-				sql += value;
+				sql += value + query.sql[i + 1];
 			} else {
 				sql += '?' + query.sql[i + 1];
 				values.push(value);
