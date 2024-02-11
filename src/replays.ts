@@ -175,6 +175,7 @@ export const Replays = new class {
 	async search(args: {
 		page?: number; isPrivate?: boolean; byRating?: boolean;
 		format?: string; username?: string; username2?: string;
+		order?: string;
 	}): Promise<ReplayData[]> {
 		const page = args.page || 0;
 		if (page > 100) return [];
@@ -185,6 +186,7 @@ export const Replays = new class {
 		const isPrivate = args.isPrivate ? 1 : 0;
 
 		const format = args.format ? toID(args.format) : null;
+		const orderDirection = args.order === 'ASC' ? 'ASC' : 'DESC';
 
 		if (args.username) {
 			const order = args.byRating ? 'rating' : 'uploadtime';
@@ -197,60 +199,60 @@ export const Replays = new class {
 						WHERE private = ${isPrivate} AND p1id = ${userid} 
 						AND p2id = ${userid2} AND format = ${format} 
 						ORDER BY 
-						${order} DESC)
+						${order} ${orderDirection})
 						 UNION 
 						(SELECT uploadtime, id, format, p1, p2, password 
 						FROM ntbb_replays FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid2} AND p2id = ${userid} 
 						AND format = ${format}
-						 ORDER BY ${order} DESC)
-						 ORDER BY ${order} DESC LIMIT ${limit1}, 51;`;
+						 ORDER BY ${order} ${orderDirection})
+						 ORDER BY ${order} ${orderDirection} LIMIT ${limit1}, 51;`;
 				} else {
 					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays 
 						FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid} AND p2id = ${userid2}
-						 ORDER BY ${order} DESC)
+						 ORDER BY ${order} ${orderDirection})
 						 UNION 
 						(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid2} AND p2id = ${userid} 
-						ORDER BY ${order} DESC)
-						 ORDER BY ${order} DESC LIMIT ${limit1}, 51;`;
+						ORDER BY ${order} ${orderDirection})
+						 ORDER BY ${order} ${orderDirection} LIMIT ${limit1}, 51;`;
 				}
 			} else {
 				if (format) {
 					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays 
 						FORCE INDEX (p1) 
 						WHERE private = ${isPrivate} AND p1id = ${userid} AND format = ${format} 
-						ORDER BY ${order} DESC) 
+						ORDER BY ${order} ${orderDirection})
 						 UNION 
 						(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays FORCE INDEX (p2)
 						 WHERE private = ${isPrivate} AND p2id = ${userid} AND format = ${format} 
-						ORDER BY ${order} DESC)
-						 ORDER BY ${order} DESC LIMIT ${limit1}, 51;`;
+						ORDER BY ${order} ${orderDirection})
+						 ORDER BY ${order} ${orderDirection} LIMIT ${limit1}, 51;`;
 				} else {
 					return replays.query()`(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays 
 						FORCE INDEX (p1) 
-						WHERE private = ${isPrivate} AND p1id = ${userid} ORDER BY ${order} DESC)
+						WHERE private = ${isPrivate} AND p1id = ${userid} ORDER BY ${order} ${orderDirection})
 						 UNION 
 						(SELECT uploadtime, id, format, p1, p2, password FROM ntbb_replays FORCE INDEX (p2) 
-						WHERE private = ${isPrivate} AND p2id = ${userid} ORDER BY ${order} DESC)
-						 ORDER BY ${order} DESC LIMIT ${limit1}, 51;`;
+						WHERE private = ${isPrivate} AND p2id = ${userid} ORDER BY ${order} ${orderDirection})
+						 ORDER BY ${order} ${orderDirection} LIMIT ${limit1}, 51;`;
 				}
 			}
 		}
 
 		if (!format) {
-			return this.recent(page);
+			return this.recent(args.order, page);
 		}
 
 		if (args.byRating) {
 			return replays.query()`SELECT uploadtime, id, format, p1, p2, rating, password 
 				FROM ntbb_replays FORCE INDEX (top) 
-				WHERE private = ${isPrivate} AND formatid = ${format} ORDER BY rating DESC LIMIT ${limit1}, 51`;
+				WHERE private = ${isPrivate} AND formatid = ${format} ORDER BY rating ${orderDirection} LIMIT ${limit1}, 51`;
 		} else {
 			return replays.query()`SELECT uploadtime, id, format, p1, p2, rating, password 
 				FROM ntbb_replays FORCE INDEX (format) 
-				WHERE private = ${isPrivate} AND formatid = ${format} ORDER BY uploadtime DESC LIMIT ${limit1}, 51`;
+				WHERE private = ${isPrivate} AND formatid = ${format} ORDER BY uploadtime ${orderDirection} LIMIT ${limit1}, 51`;
 		}
 	}
 
@@ -271,13 +273,14 @@ export const Replays = new class {
 			ORDER BY uploadtime DESC LIMIT 10;`;
 	}
 
-	async recent(page = 1) {
+	async recent(order?: string, page = 1) {
 		let limit1 = 50 * (page - 1);
 		if (limit1 < 0) limit1 = 0;
+		const orderDirection = order === 'ASC' ? 'ASC' : 'DESC';
 
 		return replays.selectAll(
 			SQL`uploadtime, id, format, p1, p2`
-		)`FORCE INDEX (recent) WHERE private = 0 ORDER BY uploadtime LIMIT ${limit1}, 51`;
+		)`FORCE INDEX (recent) WHERE private = 0 ORDER BY uploadtime ${orderDirection} LIMIT ${limit1}, 51`;
 	}
 };
 

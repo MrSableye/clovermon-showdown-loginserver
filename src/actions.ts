@@ -555,7 +555,7 @@ export const actions: {[k: string]: QueryHandler} = {
 	},
 
 	async searchreplays(params) {
-		const {page, rating, format, username, username2} = params;
+		const {page, rating, format, username, username2, order} = params;
 
 		const replays = await Replays.search({
 			page: parseInt(page || '0') || 0,
@@ -564,6 +564,7 @@ export const actions: {[k: string]: QueryHandler} = {
 			username,
 			username2,
 			isPrivate: false,
+			order,
 		});
 
 		return {replays};
