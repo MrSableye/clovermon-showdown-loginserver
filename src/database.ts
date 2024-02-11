@@ -131,6 +131,8 @@ export class Database {
 			const value = query.values[i];
 			if (query.sql[i + 1].startsWith('`')) {
 				sql = sql.slice(0, -1) + this.connection.escapeId('' + value) + query.sql[i + 1].slice(1);
+			} else if (value === 'ASC' || value === 'DESC') {
+				sql += value;
 			} else {
 				sql += '?' + query.sql[i + 1];
 				values.push(value);
