@@ -199,6 +199,7 @@ export class ActionContext {
 		// Valid CORS request.
 		this.setHeader('Access-Control-Allow-Origin', origin);
 		this.setHeader('Access-Control-Allow-Credentials', 'true');
+		this.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 		this.prefix = prefix;
 		return prefix;
 	}
