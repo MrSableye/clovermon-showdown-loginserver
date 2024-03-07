@@ -501,7 +501,7 @@ export const Users = new class {
 
 		const orderDirection = args.order === 'ASC' ? 'ASC' : 'DESC';
 
-		const userRows = await users.query()`SELECT userid, username, registertime, group
+		const userRows = await users.query()`SELECT userid, username, registertime, \`group\`
 		FROM ntbb_users ORDER BY registertime ${orderDirection} LIMIT ${limit1}, 51`;
 		return userRows.map(filterUserData);
 	}
