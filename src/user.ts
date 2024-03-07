@@ -14,7 +14,7 @@ import * as gal from 'google-auth-library';
 import {SQL} from './database';
 import {ActionError, ActionContext} from './server';
 import {toID, time, signAsync} from './utils';
-import {ladder, loginthrottle, sessions, users, usermodlog} from './tables';
+import {ladder, loginthrottle, sessions, UserRow, users, usermodlog} from './tables';
 
 const SID_DURATION = 2 * 7 * 24 * 60 * 60;
 const LOGINTIME_INTERVAL = 24 * 60 * 60;
@@ -479,3 +479,30 @@ export class Session {
 		return pass;
 	}
 }
+
+export type UserData = Pick<UserRow, 'userid' | 'username' | 'registertime' | 'group'>;
+
+const filterUserData = (userRow: UserRow): UserData => ({
+	userid: userRow.userid,
+	username: userRow.username,
+	registertime: userRow.registertime,
+	group: userRow.group,
+});
+
+export const Users = new class {
+	async search(args: {
+		page?: number; username?: string; order?: string;
+	}): Promise<UserData[]> {
+		const page = args.page || 0;
+		if (page > 100) return [];
+
+		let limit1 = 50 * (page - 1);
+		if (limit1 < 0) limit1 = 0;
+
+		const orderDirection = args.order === 'ASC' ? 'ASC' : 'DESC';
+
+		const userRows = await users.query()`SELECT userid, username, registertime, group
+		FROM ntbb_users ORDER BY uploadtime ${orderDirection} LIMIT ${limit1}, 51`;
+		return userRows.map(filterUserData);
+	}
+};

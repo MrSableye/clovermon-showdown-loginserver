@@ -14,6 +14,7 @@ import * as tables from './tables';
 import * as pathModule from 'path';
 import IPTools from './ip-tools';
 import Axios from 'axios';
+import {Users} from './user';
 
 export const actions: {[k: string]: QueryHandler} = {
 	async register(params) {
@@ -593,6 +594,17 @@ export const actions: {[k: string]: QueryHandler} = {
 				// TODO: Ratings
 			},
 		};
+	},
+
+	async users(params) {
+		const {page, username, order} = params;
+		const users = await Users.search({
+			page: parseInt(page || '0') || 0,
+			username,
+			order,
+		});
+
+		return {users};
 	},
 };
 

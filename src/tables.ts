@@ -12,7 +12,7 @@ export const psdb = new Database(Config.mysql);
 export const replaysDB = Config.replaysdb ? new Database(Config.replaysdb!) : psdb;
 export const ladderDB = Config.ladderdb ? new Database(Config.ladderdb!) : psdb;
 
-export const users = new DatabaseTable<{
+export interface UserRow {
 	userid: string;
 	usernum: number;
 	username: string;
@@ -32,7 +32,9 @@ export const users = new DatabaseTable<{
 	avatar: number;
 	logintime: number;
 	loginip: string | null;
-}>(psdb, 'users', 'userid');
+}
+
+export const users = new DatabaseTable<UserRow>(psdb, 'users', 'userid');
 
 export const ladder = new DatabaseTable<LadderEntry>(
 	ladderDB, 'ladder', 'entryid',
