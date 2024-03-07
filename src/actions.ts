@@ -536,6 +536,7 @@ export const actions: {[k: string]: QueryHandler} = {
 	},
 
 	async getreplay(params) {
+		this.verifyCrossDomainRequest();
 		const {id, password} = params;
 
 		if (!id) {
@@ -556,6 +557,7 @@ export const actions: {[k: string]: QueryHandler} = {
 	},
 
 	async searchreplays(params) {
+		this.verifyCrossDomainRequest();
 		const {page, rating, format, username, username2, order} = params;
 
 		const replays = await Replays.search({
@@ -572,6 +574,7 @@ export const actions: {[k: string]: QueryHandler} = {
 	},
 
 	async getuser(params) {
+		this.verifyCrossDomainRequest();
 		const {username} = params;
 		const userid = toID(username);
 
@@ -597,6 +600,7 @@ export const actions: {[k: string]: QueryHandler} = {
 	},
 
 	async users(params) {
+		this.verifyCrossDomainRequest();
 		const {page, username, order} = params;
 		const users = await Users.search({
 			page: parseInt(page || '0') || 0,
