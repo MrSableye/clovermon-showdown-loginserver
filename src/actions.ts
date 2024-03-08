@@ -339,6 +339,16 @@ export const actions: {[k: string]: QueryHandler} = {
 		return Ladder.getAllRatings(user);
 	},
 
+	async formatladderget(params) {
+		this.verifyCrossDomainRequest();
+		const formatid = toID(params.formatid);
+		if (!formatid) {
+			throw new ActionError('No formatid was specified.');
+		}
+		const limit = parseInt(params.limit || '500') || 500;
+		return Ladder.getTopFormat(formatid, limit);
+	},
+
 	async mmr(params) {
 		const server = await this.getServer(true);
 		if (server?.id !== Config.mainserver) {

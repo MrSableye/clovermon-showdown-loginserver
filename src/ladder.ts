@@ -99,6 +99,10 @@ export class Ladder {
 		for (const row of res) delete (row as any).rpdata;
 		return res;
 	}
+	static async getTopFormat(formatid: string, limit?: number) {
+		const actualLimit = Math.min(500, limit || 500);
+		return ladder.selectAll()`WHERE formatid = ${formatid} ORDER BY elo DESC LIMIT ${actualLimit}`;
+	}
 	async getTop(prefix: string | null = null) {
 		let needUpdate = true;
 		let top = [];
